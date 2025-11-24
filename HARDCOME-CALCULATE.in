@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>HARDCOME-CALCULATE.in</title>
+<style>
+  :root{
+    --deepblue: #001f3f;
+    --lightgreen: #28e07b;
+    --brightyellow: #ffd400;
+    --card: #06243b;
+    --accent: rgba(255,212,0,0.06);
+    --glass: rgba(255,255,255,0.03);
+    --muted: #9fb3c9;
+    --round: 12px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+    background: linear-gradient(180deg,var(--deepblue), #042a46 180%);
+    color: #eaf6ff;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    min-height:100vh;
+  }
+
+  /* Header */
+  header{
+    display:flex;align-items:center;gap:16px;padding:14px 20px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.25), rgba(0,0,0,0.12));
+    border-bottom: 3px solid rgba(255,212,0,0.14);
+    position:sticky;top:0;z-index:50;
+  }
+  .logo {
+    width:56px;height:56px;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,0.06);
+    background: linear-gradient(135deg,var(--lightgreen),var(--deepblue));
+    display:flex;align-items:center;justify-content:center;font-weight:800;
+  }
+  .logo img{width:100%;height:100%;object-fit:cover;display:block}
+  .brand {
+    display:flex;flex-direction:column;line-height:1;
+  }
+  .brand h1{margin:0;font-size:20px;color:var(--brightyellow);letter-spacing:0.6px}
+  .brand p{margin:0;color:var(--muted);font-size:13px}
+
+  /* layout */
+  .wrap{max-width:1100px;margin:22px auto;padding:0 18px}
+  .grid{display:grid;grid-template-columns: 360px 1fr;gap:18px}
+  @media(max-width:980px){ .grid{grid-template-columns:1fr} }
+
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius: var(--round);
+    padding:14px;
+    border:1px solid rgba(255,255,255,0.04);
+    box-shadow: 0 8px 26px rgba(0,0,0,0.35);
+  }
+
+  h2{margin:0 0 8px 0;color:var(--brightyellow)}
+  p.small{margin:0;color:var(--muted);font-size:13px}
+
+  /* sidebar & controls */
+  .search{display:flex;gap:8px}
+  .search input, .search select, .controls input, .controls select{
+    padding:10px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.06);color:inherit;
+  }
+  button.pulse{
+    background: linear-gradient(90deg,var(--lightgreen),#00b46a);
+    border: none;color:#012; padding:10px 12px;border-radius:10px;font-weight:800;cursor:pointer;
+  }
+  button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:8px 10px;border-radius:8px}
+
+  /* calculators layout */
+  .calc-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+  @media(max-width:520px){ .calc-row{grid-template-columns:1fr} }
+
+  .result{
+    margin-top:10px;padding:10px;border-radius:10px;background:linear-gradient(90deg, rgba(255,212,0,0.06), rgba(0,255,145,0.02));color:#012;
+    font-weight:700;
+  }
+
+  /* reminders list */
+  .rem-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .rem-item{padding:10px;border-radius:10px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03)}
+  .rem-actions{display:flex;gap:8px;margin-top:8px}
+
+  /* calendar */
+  .calendar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  @media(max-width:900px){ .calendar{grid-template-columns:repeat(2,1fr)} }
+  @media(max-width:520px){ .calendar{grid-template-columns:1fr} }
+  .month{background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));padding:10px;border-radius:10px}
+  .month h4{margin:0 0 6px 0;color:var(--lightgreen);font-size:14px}
+  .days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-size:13px}
+  .day{padding:6px;border-radius:6px;text-align:center;background:transparent}
+  .today{background:linear-gradient(90deg,var(--brightyellow),var(--lightgreen));color:#001;padding:6px;border-radius:6px;font-weight:800}
+
+  /* birthdays */
+  .bday-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+
+  /* footer */
+  footer{margin-top:18px;padding:16px;text-align:center;color:var(--brightyellow);opacity:0.95}
+  .copyright{margin-top:6px;color:var(--muted);font-size:13px}
+
+  /* small helpers */
+  .muted{color:var(--muted)}
+  a.link{color:var(--lightgreen);text-decoration:none}
+</style>
+</head>
+<body>
+
+<header>
+  <!-- Put your small logo image file in the same folder and name it "logo.png" (or update src below) -->
+  <div class="logo"><img src="logo.png" alt="logo" onerror="this.style.display='block';this.parentNode.textContent='HC'"></div>
+  <div class="brand">
+    <h1>HARDCOME-CALCULATE.in</h1>
+    <p class="small">Date tools · reminders · calendar · holidays · birthdays</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid">
+
+    <!-- SIDEBAR -->
+    <aside>
+      <div class="card">
+        <h2>Quick tools</h2>
+        <p class="small">Choose a tool below — smooth & local.</p>
+
+        <div style="margin-top:12px" class="controls">
+          <label class="muted">Quick set (today):</label>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="pulse" onclick="setToday()">Set Today</button>
+            <button class="ghost" onclick="clearAllReminders()">Clear Reminders</button>
+          </div>
+
+          <label class="muted" style="margin-top:10px;display:block">Export / Import Reminders</label>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="ghost" onclick="exportReminders()">Export</button>
+            <button class="ghost" onclick="importReminders()">Import</button>
+          </div>
+
+          <div style="margin-top:12px">
+            <div class="muted">Status</div>
+            <div id="statusBox" style="margin-top:8px;color:var(--muted);font-size:13px">Notifications: <span id="notifStatus">unknown</span></div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px" class="muted">Major India holidays are included below. Some festivals (Holi, Diwali) vary by lunar calendar — dates shown are typical for the current year where available.</div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h2>Reminders</h2>
+        <div style="margin-top:8px">
+          <input id="remText" placeholder="Reminder text (eg. Meeting)" />
+          <input id="remDT" type="datetime-local" style="margin-top:8px" />
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="pulse" onclick="addReminder()">Add</button>
+            <button class="ghost" onclick="scanReminders()">Refresh</button>
+          </div>
+        </div>
+
+        <div class="rem-list" id="remList"></div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h2>Holidays — (Current Year)</h2>
+        <div id="holidayBox" style="margin-top:10px"></div>
+      </div>
+    </aside>
+
+    <!-- MAIN AREA -->
+    <section>
+      <div class="card">
+        <h2>Date Difference</h2>
+        <p class="small">Shows detailed breakdown <strong>(years, months, days)</strong> and total days.</p>
+
+        <div class="calc-row" style="margin-top:10px">
+          <div>
+            <label class="muted">Start date</label><br>
+            <input id="d1" type="date">
+          </div>
+          <div>
+            <label class="muted">End date</label><br>
+            <input id="d2" type="date">
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="pulse" onclick="calcDifference()">Calculate</button>
+          <button class="ghost" onclick="swapDates()">Swap</button>
+          <button class="ghost" onclick="clearDiff()">Clear</button>
+        </div>
+
+        <div id="diffResult" class="result" style="display:none"></div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <h2>Add to Date</h2>
+        <p class="small">Add years, months and/or days (all three). Result shows new date & weekday.</p>
+
+        <div class="calc-row" style="margin-top:10px">
+          <div>
+            <label class="muted">Base date</label><br>
+            <input id="baseDate" type="date">
+          </div>
+          <div>
+            <label class="muted">Add (years / months / days)</label>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <input id="addYears" type="number" placeholder="Years" min="0" style="width:33%" />
+              <input id="addMonths" type="number" placeholder="Months" min="0" style="width:33%" />
+              <input id="addDaysInput" type="number" placeholder="Days" min="0" style="width:33%" />
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="pulse" onclick="addToDate()">Add</button>
+          <button class="ghost" onclick="clearAdd()">Clear</button>
+        </div>
+
+        <div id="addResult" class="result" style="display:none"></div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <h2>Current Year Calendar</h2>
+        <p class="small">Calendar for the current year — today highlighted, holidays marked.</p>
+        <div style="margin-top:12px">
+          <label class="muted">Year:</label>
+          <select id="yearSelect" style="width:160px;margin-top:8px"></select>
+        </div>
+        <div id="calendarBox" style="margin-top:12px" class="calendar"></div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <h2>Great People — Birthdays</h2>
+        <p class="small">Indian & International — readily visible for reminders.</p>
+
+        <div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:260px">
+            <strong style="color:var(--brightyellow)">Indian</strong>
+            <div class="bday-list">
+              <div>APJ Abdul Kalam — 15 Oct</div>
+              <div>Mahatma Gandhi — 2 Oct</div>
+              <div>Swami Vivekananda — 12 Jan</div>
+              <div>Rabindranath Tagore — 7 May</div>
+            </div>
+          </div>
+          <div style="flex:1;min-width:260px">
+            <strong style="color:var(--lightgreen)">International</strong>
+            <div class="bday-list">
+              <div>Albert Einstein — 14 Mar</div>
+              <div>Isaac Newton — 4 Jan</div>
+              <div>Nelson Mandela — 18 Jul</div>
+              <div>Marie Curie — 7 Nov</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div style="font-weight:800">HARDCOME-CALCULATE.in</div>
+        <div class="copyright">© <span id="copyYear"></span> HARDCOME-CALCULATE.in — All Rights Reserved</div>
+      </footer>
+    </section>
+  </div>
+</main>
+
+<script>
+/* ====== Utilities ====== */
+function qs(id){return document.getElementById(id)}
+function fmtDate(d){ return d.toLocaleDateString(); }
+function fmtWeekday(d){ return d.toLocaleDateString(undefined,{weekday:'long'}); }
+function nowISODate(){ const d=new Date(); d.setHours(0,0,0,0); return d.toISOString().slice(0,10); }
+
+/* ====== Initial values & state ====== */
+const HOLIDAYS = []; // will be filled for current year
+const REM_KEY = 'hc_reminders_v1';
+
+/* ====== Year & footer setup ====== */
+const currentYear = (new Date()).getFullYear();
+qs('copyYear').textContent = currentYear;
+
+/* Populate year select with current -5 .. +2 for convenience */
+(function initYearSelect(){
+  const sel = qs('yearSelect');
+  for(let y=currentYear-5; y<=currentYear+2; y++){
+    const o = document.createElement('option'); o.value = y; o.textContent = y;
+    if(y===currentYear) o.selected=true;
+    sel.appendChild(o);
+  }
+})();
+
+/* ====== Holiday list (example for currentYear)
+   You can extend or replace with more accurate data or API.
+   Note: festival dates like Holi/Diwali move each year; these are sample/typical values.
+*/
+function loadHolidays(year){
+  const y = Number(year);
+  // simple static/approximate list for demo purposes
+  const list = [
+    {date: new Date(y,0,26), name:'Republic Day'},
+    {date: new Date(y,7,15), name:'Independence Day'},
+    {date: new Date(y,9,2), name:'Gandhi Jayanti'},
+    // variable (approx): Diwali and Holi vary - give approximate or mark "Varies"
+    {date: null, name:'Diwali (varies)'},
+    {date: null, name:'Holi (varies)'},
+    {date: new Date(y,11,25), name:'Christmas Day'}
+  ];
+  return list;
+}
+
+/* render holidays box */
+function renderHolidayBox(){
+  const year = Number(qs('yearSelect').value);
+  const box = qs('holidayBox'); box.innerHTML='';
+  const holidays = loadHolidays(year);
+  holidays.forEach(h=>{
+    const div = document.createElement('div');
+    if(h.date instanceof Date){
+      div.textContent = `${h.name} — ${h.date.toLocaleDateString()}`;
+    } else {
+      div.textContent = `${h.name} — (date varies each year)`;
+    }
+    box.appendChild(div);
+  });
+}
+qs('yearSelect').addEventListener('change', ()=>{ renderCalendar(); renderHolidayBox(); });
+
+/* ====== Calendar generation ====== */
+function renderCalendar(){
+  const year = Number(qs('yearSelect').value);
+  const calBox = qs('calendarBox'); calBox.innerHTML='';
+  const holidays = loadHolidays(year).filter(h=>h.date);
+  for(let m=0;m<12;m++){
+    const monthWrap = document.createElement('div'); monthWrap.className='month card';
+    const monthName = new Date(year,m,1).toLocaleString(undefined,{month:'long'});
+    const h4 = document.createElement('h4'); h4.textContent = monthName + ' ' + year;
+    monthWrap.appendChild(h4);
+
+    const daysGrid = document.createElement('div'); daysGrid.className='days';
+    // weekday headers
+    const headers = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+    headers.forEach(h=>{
+      const el = document.createElement('div'); el.className='day muted'; el.style.fontWeight='700'; el.style.opacity='0.7';
+      el.textContent = h; daysGrid.appendChild(el);
+    });
+
+    const first = new Date(year,m,1);
+    const last = new Date(year,m+1,0);
+    const startWeekday = first.getDay();
+    // fill blanks
+    for(let i=0;i<startWeekday;i++){ const b = document.createElement('div'); b.className='day'; daysGrid.appendChild(b); }
+    for(let d=1; d<= last.getDate(); d++){
+      const cell = document.createElement('div'); cell.className='day';
+      const cellDate = new Date(year,m,d);
+      cell.textContent = d;
+      // highlight today
+      const today = new Date();
+      if(cellDate.toDateString() === today.toDateString()){
+        cell.classList.add('today');
+        cell.title = 'Today';
+      }
+      // mark holidays for exact dates
+      const exactHoliday = loadHolidays(year).find(h => h.date && h.date.toDateString()===cellDate.toDateString());
+      if(exactHoliday){
+        cell.style.border = '1px dashed ' + 'rgba(255,212,0,0.6)';
+        cell.title = exactHoliday.name;
+      }
+      daysGrid.appendChild(cell);
+    }
+    monthWrap.appendChild(daysGrid);
+    calBox.appendChild(monthWrap);
+  }
+}
+qs('yearSelect').addEventListener('change', renderCalendar);
+
+/* ====== Date Difference (years, months, days + total days) ====== */
+function calcDifference(){
+  const aVal = qs('d1').value;
+  const bVal = qs('d2').value;
+  const out = qs('diffResult');
+  if(!aVal || !bVal){ out.style.display='block'; out.textContent='Please select both dates'; return; }
+  const A = new Date(aVal + 'T00:00:00');
+  const B = new Date(bVal + 'T00:00:00');
+
+  // Ensure start <= end
+  let start = A <= B ? A : B;
+  let end   = A <= B ? B : A;
+
+  // total days
+  const diffMs = end - start;
+  const totalDays = Math.floor(diffMs / (1000*60*60*24));
+
+  // compute years, months, days accurately
+  let sy = start.getFullYear(), sm = start.getMonth(), sd = start.getDate();
+  let ey = end.getFullYear(), em = end.getMonth(), ed = end.getDate();
+
+  let years = ey - sy;
+  let months = em - sm;
+  let days = ed - sd;
+
+  if(days < 0){
+    // borrow days from previous month
+    const prev = new Date(end.getFullYear(), end.getMonth(), 0); // last day of previous month
+    days += prev.getDate();
+    months -= 1;
+  }
+  if(months < 0){
+    months += 12;
+    years -= 1;
+  }
+
+  // weekday info
+  const sw = fmtWeekday(start);
+  const ew = fmtWeekday(end);
+
+  out.style.display='block';
+  out.innerHTML = `
+    Start: <strong>${start.toDateString()}</strong> — <em>${sw}</em><br>
+    End: <strong>${end.toDateString()}</strong> — <em>${ew}</em><br>
+    <div style="margin-top:8px;padding:8px;border-radius:8px;background:linear-gradient(90deg, rgba(255,212,0,0.06), rgba(40,224,123,0.04));color:#012;font-weight:800">
+      Difference: ${years} years, ${months} months, ${days} days<br>
+      Total days: ${totalDays} day(s)
+    </div>
+  `;
+}
+
+/* Swap / clear */
+function swapDates(){
+  const v1 = qs('d1').value, v2 = qs('d2').value;
+  qs('d1').value = v2; qs('d2').value = v1;
+  calcDifference();
+}
+function clearDiff(){ qs('d1').value=''; qs('d2').value=''; qs('diffResult').style.display='none'; }
+
+/* ====== Add to Date (years/months/days) ====== */
+function addToDate(){
+  const baseVal = qs('baseDate').value;
+  if(!baseVal){ qs('addResult').style.display='block'; qs('addResult').textContent='Select base date'; return; }
+  const yearsToAdd = parseInt(qs('addYears').value || '0',10);
+  const monthsToAdd = parseInt(qs('addMonths').value || '0',10);
+  const daysToAdd = parseInt(qs('addDaysInput').value || '0',10);
+
+  let dt = new Date(baseVal + 'T00:00:00');
+  // add years then months then days (this order prevents month-flip issues)
+  if(yearsToAdd) dt.setFullYear(dt.getFullYear() + yearsToAdd);
+  if(monthsToAdd) dt.setMonth(dt.getMonth() + monthsToAdd);
+  if(daysToAdd) dt.setDate(dt.getDate() + daysToAdd);
+
+  qs('addResult').style.display='block';
+  qs('addResult').innerHTML = `New date: <strong>${dt.toDateString()}</strong> — <em>${fmtWeekday(dt)}</em>`;
+}
+function clearAdd(){ qs('baseDate').value=''; qs('addYears').value=''; qs('addMonths').value=''; qs('addDaysInput').value=''; qs('addResult').style.display='none'; }
+
+/* ====== Reminders (localStorage) ====== */
+function readReminders(){ try{ return JSON.parse(localStorage.getItem(REM_KEY) || '[]'); }catch(e){ return []; } }
+function saveReminders(arr){ localStorage.setItem(REM_KEY, JSON.stringify(arr)); }
+
+function addReminder(){
+  const text = qs('remText').value.trim();
+  const dtVal = qs('remDT').value;
+  if(!text || !dtVal){ alert('Enter reminder text and date-time'); return; }
+  const timestamp = (new Date(dtVal)).getTime();
+  if(isNaN(timestamp) || timestamp < Date.now()){ alert('Choose a future date/time'); return; }
+  const rem = {id: Date.now(), text, time: timestamp, fired:false};
+  const arr = readReminders(); arr.push(rem); saveReminders(arr);
+  qs('remText').value=''; qs('remDT').value='';
+  renderReminders();
+  scheduleReminder(rem); // schedule immediately in this session
+}
+
+/* schedule a single reminder */
+function scheduleReminder(rem){
+  const delay = rem.time - Date.now();
+  if(delay <= 0) return;
+  setTimeout(()=>{ triggerReminder(rem); }, delay);
+}
+
+/* trigger reminder: try Notification API, fallback to alert */
+function triggerReminder(rem){
+  if(rem.fired) return;
+  // show notification if allowed
+  if(window.Notification && Notification.permission === 'granted'){
+    const n = new Notification('HARDCOME Reminder', { body: rem.text, silent: false });
+    n.onclick = ()=> window.focus();
+  } else {
+    alert('Reminder: ' + rem.text);
+  }
+  // mark fired in storage
+  const arr = readReminders();
+  const idx = arr.findIndex(r=>r.id===rem.id);
+  if(idx>=0){ arr[idx].fired = true; saveReminders(arr); renderReminders(); }
+}
+
+/* schedule all on page load */
+function scheduleAll(){
+  const arr = readReminders();
+  arr.forEach(r => { if(!r.fired) scheduleReminder(r); });
+}
+
+/* render list */
+function renderReminders(){
+  const box = qs('remList'); box.innerHTML='';
+  const arr = readReminders().sort((a,b)=>a.time - b.time);
+  if(!arr.length){ box.innerHTML = '<div class="muted">No reminders</div>'; return; }
+  arr.forEach(r=>{
+    const el = document.createElement('div'); el.className='rem-item';
+    const when = new Date(r.time);
+    el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+      <div><strong>${r.text}</strong><div class="muted" style="font-size:13px">${when.toLocaleString()}</div></div>
+      <div style="text-align:right">
+        ${r.fired?'<div style="color:#ffd400;font-weight:800">SENT</div>':''}
+        <div class="rem-actions">
+          <button class="ghost" onclick="deleteReminder(${r.id})">Delete</button>
+          <button class="ghost" onclick="editReminder(${r.id})">Edit</button>
+        </div>
+      </div>
+    </div>`;
+    box.appendChild(el);
+  });
+}
+
+/* delete & edit */
+function deleteReminder(id){
+  if(!confirm('Delete reminder?')) return;
+  const arr = readReminders().filter(r=>r.id!==id);
+  saveReminders(arr); renderReminders();
+}
+function editReminder(id){
+  const arr = readReminders(); const rem = arr.find(r=>r.id===id);
+  if(!rem) return;
+  const newText = prompt('Edit text', rem.text); if(newText===null) return;
+  const newDt = prompt('Edit datetime (YYYY-MM-DDTHH:MM)', new Date(rem.time).toISOString().slice(0,16)); if(newDt===null) return;
+  const newTime = new Date(newDt).getTime();
+  if(isNaN(newTime) || newTime <= Date.now()){ alert('Invalid or past date'); return; }
+  rem.text = newText; rem.time = newTime; rem.fired = false;
+  saveReminders(arr); renderReminders(); scheduleReminder(rem);
+}
+
+/* export / import */
+function exportReminders(){
+  const data = JSON.stringify(readReminders(), null, 2);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([data], {type:'application/json'}));
+  a.download = 'hardcome_reminders.json'; a.click(); URL.revokeObjectURL(a.href);
+}
+function importReminders(){
+  const text = prompt('Paste reminders JSON here (array)'); if(!text) return;
+  try{
+    const arr = JSON.parse(text);
+    if(!Array.isArray(arr)) throw 'Not array';
+    saveReminders(arr);
+    renderReminders();
+    scheduleAll();
+    alert('Imported');
+  }catch(e){
+    alert('Invalid JSON');
+  }
+}
+function clearAllReminders(){ if(!confirm('Clear all reminders?')) return; saveReminders([]); renderReminders(); }
+
+/* scan reminders manually */
+function scanReminders(){ renderReminders(); scheduleAll(); }
+
+/* ====== Notification permission helper ====== */
+function initNotifications(){
+  if(!("Notification" in window)){ qs('notifStatus').textContent='unsupported'; return; }
+  if(Notification.permission === 'granted'){ qs('notifStatus').textContent='granted'; }
+  else if(Notification.permission === 'denied'){ qs('notifStatus').textContent='denied'; }
+  else {
+    qs('notifStatus').textContent='prompting...';
+    Notification.requestPermission().then(p=>{
+      qs('notifStatus').textContent = p;
+    });
+  }
+}
+
+/* ====== Helpers ====== */
+function setToday(){
+  const today = nowISODate();
+  qs('d1').value = today; qs('d2').value = today; qs('baseDate').value = today;
+  renderCalendar();
+}
+
+/* ====== initialize UI & data ====== */
+function init(){
+  // holidays and calendar / boxes
+  renderHolidayBox();
+  renderCalendar();
+  renderReminders();
+  initNotifications();
+  scheduleAll();
+  // show current year value in holiday panel
+  qs('yearSelect').value = currentYear;
+}
+init();
+
+/* ====== Expose some functions for console debugging (optional) ====== */
+window.hardcome = {
+  calcDifference, addToDate, addReminder, renderReminders, readReminders,
+  exportReminders, importReminders, clearAllReminders, renderCalendar
+};
+</script>
+</body>
+</html>
